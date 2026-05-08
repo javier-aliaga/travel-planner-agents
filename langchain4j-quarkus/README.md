@@ -22,11 +22,15 @@ TravelPlanner (@SequenceAgent)
 
 | Agent | Type | Tools | Description |
 |-------|------|-------|-------------|
+| WeatherAssistant | `@Agent` | WeatherTools | Checks weather for a city |
+| CityGuide | `@Agent` | CityGuideTools (3) | Attractions, restaurants, and transport info |
 | FlightFinder | `@Agent` | FlightTools | Searches and recommends flights |
 | HotelFinder | `@Agent` | HotelTools | Searches and recommends hotels |
 | ActivityPlanner | `@Agent` | ActivityTools | Plans activities based on interests |
 | ItineraryFormatter | `@Agent` | none | Combines results into a formatted itinerary |
-| TravelResearch | `@ParallelAgent` | — | Runs flight, hotel, and activity search concurrently |
+| TripPrep | `@SequenceAgent` | — | Weather → CityGuide in sequence |
+| QuickResearch | `@ParallelAgent` | — | Weather + CityGuide in parallel |
+| TravelResearch | `@ParallelAgent` | — | Flight + hotel + activity search concurrently |
 | TravelPlanner | `@SequenceAgent` | — | Orchestrates research then formatting |
 
 ### Tools
@@ -73,7 +77,17 @@ dapr run --app-id travel-planner-app --app-port 8080 -- mvn quarkus:dev
 
 Workflows will be visible in the Diagrid Dashboard.
 
-### Calling the endpoint
+### Endpoints
+
+| Endpoint | Agent | Type | Status |
+|----------|-------|------|--------|
+| `make test-weather` | WeatherAssistant | Standalone (1 tool) | COMPLETED |
+| `make test-guide` | CityGuide | Standalone (3 tools) | COMPLETED |
+| `make test-trip` | TripPrep | @SequenceAgent (2 standalone agents) | COMPLETED |
+| `make test-research` | QuickResearch | @ParallelAgent (2 standalone agents) | COMPLETED |
+| `make test-travel` | TravelPlanner | @SequenceAgent + nested @ParallelAgent | Known issue: nested composite input mismatch |
+
+### Calling the travel endpoint
 
 ```bash
 curl "http://localhost:8080/travel/plan?origin=NYC&destination=Paris&date=2025-07-01&nights=5&interests=history,food"
@@ -124,17 +138,27 @@ Tests require Docker for Dapr dev services (automatically enabled in test scope)
 
 ```
 src/main/java/io/dapr/examples/travel/
-├── TravelResource.java              GET /travel/plan endpoint
+├── WeatherResource.java             GET /weather
+├── CityGuideResource.java           GET /guide
+├── TripPrepResource.java            GET /trip
+├── QuickResearchResource.java       GET /research
+├── TravelResource.java              GET /travel/plan
 ├── agents/
+│   ├── WeatherAssistant.java        @Agent + WeatherTools
+│   ├── CityGuide.java               @Agent + CityGuideTools
 │   ├── FlightFinder.java            @Agent + FlightTools
 │   ├── HotelFinder.java             @Agent + HotelTools
 │   ├── ActivityPlanner.java         @Agent + ActivityTools
 │   └── ItineraryFormatter.java      @Agent (LLM-only, no tools)
 ├── orchestration/
+│   ├── TripPrep.java                @SequenceAgent (weather → guide)
+│   ├── QuickResearch.java           @ParallelAgent (weather + guide)
 │   ├── TravelPlanner.java           @SequenceAgent (top-level)
 │   ├── TravelResearch.java          @ParallelAgent (research phase)
 │   └── TravelResearchResult.java    Result record
 └── tools/
+    ├── WeatherTools.java            Mock weather API
+    ├── CityGuideTools.java          Mock city guide APIs (3 tools)
     ├── FlightTools.java             Mock flight search
     ├── HotelTools.java              Mock hotel search
     └── ActivityTools.java           Mock activity search
