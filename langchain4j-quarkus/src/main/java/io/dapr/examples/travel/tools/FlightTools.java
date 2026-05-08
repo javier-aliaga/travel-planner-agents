@@ -1,5 +1,6 @@
 package io.dapr.examples.travel.tools;
 
+import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -11,7 +12,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class FlightTools {
 
     @Tool("Search for available flights between two cities on a given date")
-    public String searchFlights(String origin, String destination, String date) {
+    public String searchFlights(@P("departure city") String origin,
+                                @P("destination city") String destination,
+                                @P("travel date") String date) {
         return switch (destination.toLowerCase()) {
             case "paris" -> String.format(
                     "Found 3 flights from %s to Paris on %s: "

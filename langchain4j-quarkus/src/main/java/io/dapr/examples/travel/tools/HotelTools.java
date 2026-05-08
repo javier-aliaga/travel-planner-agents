@@ -1,5 +1,6 @@
 package io.dapr.examples.travel.tools;
 
+import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -11,7 +12,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class HotelTools {
 
     @Tool("Search for available hotels in a city for a given number of nights")
-    public String searchHotels(String city, String checkIn, int nights) {
+    public String searchHotels(@P("the city name") String city,
+                               @P("check-in date") String checkIn,
+                               @P("number of nights") int nights) {
         return switch (city.toLowerCase()) {
             case "paris" -> String.format(
                     "Found 3 hotels in Paris (check-in %s, %d nights): "

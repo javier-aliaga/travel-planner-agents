@@ -1,5 +1,6 @@
 package io.dapr.examples.travel.tools;
 
+import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -11,7 +12,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class ActivityTools {
 
     @Tool("Search for activities and attractions in a city matching the given interests")
-    public String searchActivities(String city, String interests) {
+    public String searchActivities(@P("the city name") String city,
+                                   @P("comma-separated interests") String interests) {
         return switch (city.toLowerCase()) {
             case "paris" -> String.format(
                     "Top activities in Paris matching '%s': "
