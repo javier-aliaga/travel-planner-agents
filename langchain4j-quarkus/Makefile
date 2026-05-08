@@ -35,6 +35,9 @@ test-weather:
 test-guide:
 	curl -s "http://localhost:8080/guide?city=Paris&cuisine=french&days=3"
 
+test-research:
+	curl -s "http://localhost:8080/research?city=Paris&cuisine=french&days=3"
+
 test-trip:
 	curl -s "http://localhost:8080/trip?city=Paris&cuisine=french&days=3"
 
