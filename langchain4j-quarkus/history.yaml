@@ -1,0 +1,132 @@
+execution:
+  appId: langchain4j-agent
+  input: "{\"agentRunId\":\"cd6df128-4b59-4e6f-994e-81d71560d936\",\"agentName\":\"city-guide\",\"userMessage\":\"Create a city guide for Paris.\\nCuisine preference: french.\\nTrip duration: 3 days.\\n\",\"systemMessage\":\"You are an expert city travel guide. When asked about a city, you MUST:\\n1. First find the top attractions using the findAttractions tool\\n2. Then search for restaurants matching the user's cuisine preference using searchRestaurants\\n3. Finally get transport information using getTransportInfo\\nCombine all results into a well-organized city guide with sections for\\nAttractions, Restaurants, and Getting Around.\\nKeep it concise but informative.\\n\"}"
+  name: dapr.langchain4j.CityGuide.workflow
+  previousStatus: ""
+  startAt: 2026-05-07T08:14:47.893346378Z
+  status: running
+  workflowId: cd6df128-4b59-4e6f-994e-81d71560d936
+history:
+- date: 2026-05-07T08:15:00.476598502Z
+  eventType: ExecutionCompleted
+  metadata:
+    name: dapr.langchain4j.CityGuide.workflow
+    orchestration_status: completed
+- date: 2026-05-07T08:15:00.369632207Z
+  eventType: TaskCompleted
+  metadata:
+    name: llm-call
+    task_execution_id: 4f3f65b9-c6d8-53f6-be5c-ce700b4b621d
+    task_scheduled_id: "9"
+  output: "{\"methodName\":\"chat\",\"prompt\":\"[SystemMessage { text = \\\"You are an expert city travel guide. When asked about a city, you MUST:\\n1. First find the top attractions using the findAttractions tool\\n2. Then search for restaurants matching the user's cuisine preference using searchRestaurants\\n3. Finally get transport information using getTransportInfo\\nCombine all results into a well-organized city guide with sections for\\nAttractions, Restaurants, and Getting Around.\\nKeep it concise but informative.\\n\\\" }, UserMessage { name = null, contents = [TextContent { text = \\\"Create a city guide for Paris.\\nCuisine preference: french.\\nTrip duration: 3 days.\\n\\\" }], attributes = {} }, AiMessage { text = null, thinking = null, toolExecutionRequests = [ToolExecutionRequest { id = null, name = \\\"findAttractions\\\", arguments = \\\"{\\\"city\\\":\\\"Paris\\\"}\\\" }, ToolExecutionRequest { id = null, name = \\\"searchRestaurants\\\", arguments = \\\"{\\\"cuisine\\\":\\\"french\\\",\\\"city\\\":\\\"Paris\\\"}\\\" }, ToolExecutionRequest { id = null, name = \\\"getTransportInfo\\\", arguments = \\\"{\\\"city\\\":\\\"Paris\\\"}\\\" }], attributes = {} }, ToolExecutionResultMessage { id = null toolName = \\\"findAttractions\\\" text = \\\"\\\"1. Eiffel Tower — iconic landmark, open 9:30-23:00, €26 adult\\\\n2. Louvre Museum — world's largest art museum, closed Tuesdays, €17\\\\n3. Sacré-Cœur — hilltop basilica in Montmartre, free entry\\\\n4. Seine River Cruise — 1hr scenic boat tour, €15\\\\n5. Musée d'Orsay — impressionist art, closed Mondays, €16\\\"\\\" isError = null }, ToolExecutionResultMessage { id = null toolName = \\\"searchRestaurants\\\" text = \\\"\\\"1. Le Comptoir du Panthéon — classic bistro, €€, 4.6★\\\\n2. Chez Janou — provençal cuisine, €€, 4.5★\\\\n3. Le Bouillon Chartier — historic brasserie, €, 4.3★\\\"\\\" isError = null }, ToolExecutionResultMessage { id = null toolName = \\\"getTransportInfo\\\" text = \\\"\\\"Metro: 16 lines, runs 5:30-01:00 (02:00 Fri/Sat). Single ticket €2.15, day pass (Navigo Jour) €8.45. Covers zones 1-5.\\\\nBus: extensive network, same tickets as metro.\\\\nVélib: bike-share, €5/day for 30-min rides.\\\\nTip: Buy a carnet of 10 tickets for €17.35 (save 20%).\\\"\\\" isError = null }]\",\"response\":\"**Paris City Guide**\\n\\n**Attractions**\\n----------------\\n\\n1. Eiffel Tower — iconic landmark, open 9:30-23:00, €26 adult\\n2. Louvre Museum — world's largest art museum, closed Tuesdays, €17\\n3. Sacré-Cœur — hilltop basilica in Montmartre, free entry\\n4. Seine River Cruise — 1hr scenic boat tour, €15\\n5. Musée d'Orsay — impressionist art, closed Mondays, €16\\n\\n**Restaurants**\\n----------------\\n\\nFor a French culinary experience, try:\\n\\n1. Le Comptoir du Panthéon — classic bistro, €€, 4.6★\\n2. Chez Janou — provençal cuisine, €€, 4.5★\\n3. Le Bouillon Chartier — historic brasserie, €, 4.3★\\n\\n**Getting Around**\\n-------------------\\n\\nParis has an extensive public transportation system:\\n\\n* Metro: 16 lines, runs 5:30-01:00 (02:00 Fri/Sat). Single ticket €2.15, day pass (Navigo Jour) €8.45. Covers zones 1-5.\\n* Bus: extensive network, same tickets as metro.\\n* Vélib: bike-share, €5/day for 30-min rides.\\n* Tip: Buy a carnet of 10 tickets for €17.35 (save 20%).\\n\\nEnjoy your trip to Paris!\"}"
+- date: 2026-05-07T08:15:00.369527225Z
+  eventType: EventRaised
+  metadata:
+    name: agent-event
+  input: "{\"type\":\"done\",\"toolCallId\":null,\"toolName\":null,\"args\":null}"
+- date: 2026-05-07T08:14:53.500954342Z
+  eventId: "9"
+  eventType: TaskScheduled
+  metadata:
+    name: llm-call
+    parent_trace_context_trace_parent: 00-53d49e649fef905eb5de9a4c302eaa9a-1301d470e35a188a-01
+    task_execution_id: 4f3f65b9-c6d8-53f6-be5c-ce700b4b621d
+    task_scheduled_id: "9"
+  input: "{\"agentRunId\":\"cd6df128-4b59-4e6f-994e-81d71560d936\",\"llmCallId\":\"b3f9d593-cdc4-4e2d-90f7-ccd2d68a34db\",\"methodName\":\"chat\",\"prompt\":\"[SystemMessage { text = \\\"You are an expert city travel guide. When asked about a city, you MUST:\\n1. First find the top attractions using the findAttractions tool\\n2. Then search for restaurants matching the user's cuisine preference using searchRestaurants\\n3. Finally get transport information using getTransportInfo\\nCombine all results into a well-organized city guide with sections for\\nAttractions, Restaurants, and Getting Around.\\nKeep it concise but informative.\\n\\\" }, UserMessage { name = null, contents = [TextContent { text = \\\"Create a city guide for Paris.\\nCuisine preference: french.\\nTrip duration: 3 days.\\n\\\" }], attributes = {} }, AiMessage { text = null, thinking = null, toolExecutionRequests = [ToolExecutionRequest { id = null, name = \\\"findAttractions\\\", arguments = \\\"{\\\"city\\\":\\\"Paris\\\"}\\\" }, ToolExecutionRequest { id = null, name = \\\"searchRestaurants\\\", arguments = \\\"{\\\"cuisine\\\":\\\"french\\\",\\\"city\\\":\\\"Paris\\\"}\\\" }, ToolExecutionRequest { id = null, name = \\\"getTransportInfo\\\", arguments = \\\"{\\\"city\\\":\\\"Paris\\\"}\\\" }], attributes = {} }, ToolExecutionResultMessage { id = null toolName = \\\"findAttractions\\\" text = \\\"\\\"1. Eiffel Tower — iconic landmark, open 9:30-23:00, €26 adult\\\\n2. Louvre Museum — world's largest art museum, closed Tuesdays, €17\\\\n3. Sacré-Cœur — hilltop basilica in Montmartre, free entry\\\\n4. Seine River Cruise — 1hr scenic boat tour, €15\\\\n5. Musée d'Orsay — impressionist art, closed Mondays, €16\\\"\\\" isError = null }, ToolExecutionResultMessage { id = null toolName = \\\"searchRestaurants\\\" text = \\\"\\\"1. Le Comptoir du Panthéon — classic bistro, €€, 4.6★\\\\n2. Chez Janou — provençal cuisine, €€, 4.5★\\\\n3. Le Bouillon Chartier — historic brasserie, €, 4.3★\\\"\\\" isError = null }, ToolExecutionResultMessage { id = null toolName = \\\"getTransportInfo\\\" text = \\\"\\\"Metro: 16 lines, runs 5:30-01:00 (02:00 Fri/Sat). Single ticket €2.15, day pass (Navigo Jour) €8.45. Covers zones 1-5.\\\\nBus: extensive network, same tickets as metro.\\\\nVélib: bike-share, €5/day for 30-min rides.\\\\nTip: Buy a carnet of 10 tickets for €17.35 (save 20%).\\\"\\\" isError = null }]\"}"
+- date: 2026-05-07T08:14:53.372846525Z
+  eventType: EventRaised
+  metadata:
+    name: agent-event
+  input: "{\"type\":\"llm-call\",\"toolCallId\":\"b3f9d593-cdc4-4e2d-90f7-ccd2d68a34db\",\"toolName\":\"chat\",\"args\":\"[SystemMessage { text = \\\"You are an expert city travel guide. When asked about a city, you MUST:\\n1. First find the top attractions using the findAttractions tool\\n2. Then search for restaurants matching the user's cuisine preference using searchRestaurants\\n3. Finally get transport information using getTransportInfo\\nCombine all results into a well-organized city guide with sections for\\nAttractions, Restaurants, and Getting Around.\\nKeep it concise but informative.\\n\\\" }, UserMessage { name = null, contents = [TextContent { text = \\\"Create a city guide for Paris.\\nCuisine preference: french.\\nTrip duration: 3 days.\\n\\\" }], attributes = {} }, AiMessage { text = null, thinking = null, toolExecutionRequests = [ToolExecutionRequest { id = null, name = \\\"findAttractions\\\", arguments = \\\"{\\\"city\\\":\\\"Paris\\\"}\\\" }, ToolExecutionRequest { id = null, name = \\\"searchRestaurants\\\", arguments = \\\"{\\\"cuisine\\\":\\\"french\\\",\\\"city\\\":\\\"Paris\\\"}\\\" }, ToolExecutionRequest { id = null, name = \\\"getTransportInfo\\\", arguments = \\\"{\\\"city\\\":\\\"Paris\\\"}\\\" }], attributes = {} }, ToolExecutionResultMessage { id = null toolName = \\\"findAttractions\\\" text = \\\"\\\"1. Eiffel Tower — iconic landmark, open 9:30-23:00, €26 adult\\\\n2. Louvre Museum — world's largest art museum, closed Tuesdays, €17\\\\n3. Sacré-Cœur — hilltop basilica in Montmartre, free entry\\\\n4. Seine River Cruise — 1hr scenic boat tour, €15\\\\n5. Musée d'Orsay — impressionist art, closed Mondays, €16\\\"\\\" isError = null }, ToolExecutionResultMessage { id = null toolName = \\\"searchRestaurants\\\" text = \\\"\\\"1. Le Comptoir du Panthéon — classic bistro, €€, 4.6★\\\\n2. Chez Janou — provençal cuisine, €€, 4.5★\\\\n3. Le Bouillon Chartier — historic brasserie, €, 4.3★\\\"\\\" isError = null }, ToolExecutionResultMessage { id = null toolName = \\\"getTransportInfo\\\" text = \\\"\\\"Metro: 16 lines, runs 5:30-01:00 (02:00 Fri/Sat). Single ticket €2.15, day pass (Navigo Jour) €8.45. Covers zones 1-5.\\\\nBus: extensive network, same tickets as metro.\\\\nVélib: bike-share, €5/day for 30-min rides.\\\\nTip: Buy a carnet of 10 tickets for €17.35 (save 20%).\\\"\\\" isError = null }]\"}"
+- date: 2026-05-07T08:14:53.371932452Z
+  eventType: TaskCompleted
+  metadata:
+    name: tool-call
+    task_execution_id: 7cac1819-2cbd-5d22-a4b9-77d5ea1319b2
+    task_scheduled_id: "7"
+  output: "{\"toolName\":\"getTransportInfo\",\"args\":\"[Paris]\",\"result\":\"Metro: 16 lines, runs 5:30-01:00 (02:00 Fri/Sat). Single ticket €2.15, day pass (Navigo Jour) €8.45. Covers zones 1-5.\\nBus: extensive network, same tickets as metro.\\nVélib: bike-share, €5/day for 30-min rides.\\nTip: Buy a carnet of 10 tickets for €17.35 (save 20%).\"}"
+- date: 2026-05-07T08:14:53.310915918Z
+  eventId: "7"
+  eventType: TaskScheduled
+  metadata:
+    name: tool-call
+    parent_trace_context_trace_parent: 00-53d49e649fef905eb5de9a4c302eaa9a-1301d470e35a188a-01
+    task_execution_id: 7cac1819-2cbd-5d22-a4b9-77d5ea1319b2
+    task_scheduled_id: "7"
+  input: "{\"agentRunId\":\"cd6df128-4b59-4e6f-994e-81d71560d936\",\"toolCallId\":\"1cd3ab11-4ebb-4f3c-9bca-23acbebae469\",\"toolName\":\"getTransportInfo\",\"args\":\"[Paris]\"}"
+- date: 2026-05-07T08:14:53.23677833Z
+  eventType: TaskCompleted
+  metadata:
+    name: tool-call
+    task_execution_id: 9de58ce0-f90b-51f3-b9cd-372df53bcdd5
+    task_scheduled_id: "5"
+  output: "{\"toolName\":\"searchRestaurants\",\"args\":\"[Paris, french]\",\"result\":\"1. Le Comptoir du Panthéon — classic bistro, €€, 4.6★\\n2. Chez Janou — provençal cuisine, €€, 4.5★\\n3. Le Bouillon Chartier — historic brasserie, €, 4.3★\"}"
+- date: 2026-05-07T08:14:53.23676441Z
+  eventType: EventRaised
+  metadata:
+    name: agent-event
+  input: "{\"type\":\"tool-call\",\"toolCallId\":\"1cd3ab11-4ebb-4f3c-9bca-23acbebae469\",\"toolName\":\"getTransportInfo\",\"args\":\"[Paris]\"}"
+- date: 2026-05-07T08:14:53.176930672Z
+  eventId: "5"
+  eventType: TaskScheduled
+  metadata:
+    name: tool-call
+    parent_trace_context_trace_parent: 00-53d49e649fef905eb5de9a4c302eaa9a-1301d470e35a188a-01
+    task_execution_id: 9de58ce0-f90b-51f3-b9cd-372df53bcdd5
+    task_scheduled_id: "5"
+  input: "{\"agentRunId\":\"cd6df128-4b59-4e6f-994e-81d71560d936\",\"toolCallId\":\"cbfc4635-6965-4580-8cfe-cec956d2d4f9\",\"toolName\":\"searchRestaurants\",\"args\":\"[Paris, french]\"}"
+- date: 2026-05-07T08:14:53.10775413Z
+  eventType: EventRaised
+  metadata:
+    name: agent-event
+  input: "{\"type\":\"tool-call\",\"toolCallId\":\"cbfc4635-6965-4580-8cfe-cec956d2d4f9\",\"toolName\":\"searchRestaurants\",\"args\":\"[Paris, french]\"}"
+- date: 2026-05-07T08:14:53.106844898Z
+  eventType: TaskCompleted
+  metadata:
+    name: tool-call
+    task_execution_id: e62b6dca-d585-52b4-ab91-1588df30c79e
+    task_scheduled_id: "3"
+  output: "{\"toolName\":\"findAttractions\",\"args\":\"[Paris]\",\"result\":\"1. Eiffel Tower — iconic landmark, open 9:30-23:00, €26 adult\\n2. Louvre Museum — world's largest art museum, closed Tuesdays, €17\\n3. Sacré-Cœur — hilltop basilica in Montmartre, free entry\\n4. Seine River Cruise — 1hr scenic boat tour, €15\\n5. Musée d'Orsay — impressionist art, closed Mondays, €16\"}"
+- date: 2026-05-07T08:14:53.044909272Z
+  eventId: "3"
+  eventType: TaskScheduled
+  metadata:
+    name: tool-call
+    parent_trace_context_trace_parent: 00-53d49e649fef905eb5de9a4c302eaa9a-1301d470e35a188a-01
+    task_execution_id: e62b6dca-d585-52b4-ab91-1588df30c79e
+    task_scheduled_id: "3"
+  input: "{\"agentRunId\":\"cd6df128-4b59-4e6f-994e-81d71560d936\",\"toolCallId\":\"356d3f85-c20a-4ecd-985d-815b00df2fd2\",\"toolName\":\"findAttractions\",\"args\":\"[Paris]\"}"
+- date: 2026-05-07T08:14:52.965839518Z
+  eventType: TaskCompleted
+  metadata:
+    name: llm-call
+    task_execution_id: 55e43570-7da6-5257-9847-6acc5c60ed56
+    task_scheduled_id: "1"
+  output: "{\"methodName\":\"chat\",\"prompt\":\"[SystemMessage { text = \\\"You are an expert city travel guide. When asked about a city, you MUST:\\n1. First find the top attractions using the findAttractions tool\\n2. Then search for restaurants matching the user's cuisine preference using searchRestaurants\\n3. Finally get transport information using getTransportInfo\\nCombine all results into a well-organized city guide with sections for\\nAttractions, Restaurants, and Getting Around.\\nKeep it concise but informative.\\n\\\" }, UserMessage { name = null, contents = [TextContent { text = \\\"Create a city guide for Paris.\\nCuisine preference: french.\\nTrip duration: 3 days.\\n\\\" }], attributes = {} }]\",\"response\":\"null\"}"
+- date: 2026-05-07T08:14:52.965833288Z
+  eventType: EventRaised
+  metadata:
+    name: agent-event
+  input: "{\"type\":\"tool-call\",\"toolCallId\":\"356d3f85-c20a-4ecd-985d-815b00df2fd2\",\"toolName\":\"findAttractions\",\"args\":\"[Paris]\"}"
+- date: 2026-05-07T08:14:48.312448475Z
+  eventId: "1"
+  eventType: TaskScheduled
+  metadata:
+    name: llm-call
+    parent_trace_context_trace_parent: 00-53d49e649fef905eb5de9a4c302eaa9a-1301d470e35a188a-01
+    task_execution_id: 55e43570-7da6-5257-9847-6acc5c60ed56
+    task_scheduled_id: "1"
+  input: "{\"agentRunId\":\"cd6df128-4b59-4e6f-994e-81d71560d936\",\"llmCallId\":\"a774a84e-23f6-417d-b7e6-b0bbe21708cb\",\"methodName\":\"chat\",\"prompt\":\"[SystemMessage { text = \\\"You are an expert city travel guide. When asked about a city, you MUST:\\n1. First find the top attractions using the findAttractions tool\\n2. Then search for restaurants matching the user's cuisine preference using searchRestaurants\\n3. Finally get transport information using getTransportInfo\\nCombine all results into a well-organized city guide with sections for\\nAttractions, Restaurants, and Getting Around.\\nKeep it concise but informative.\\n\\\" }, UserMessage { name = null, contents = [TextContent { text = \\\"Create a city guide for Paris.\\nCuisine preference: french.\\nTrip duration: 3 days.\\n\\\" }], attributes = {} }]\"}"
+- date: 2026-05-07T08:14:48.248730156Z
+  eventType: EventRaised
+  metadata:
+    name: agent-event
+  input: "{\"type\":\"llm-call\",\"toolCallId\":\"a774a84e-23f6-417d-b7e6-b0bbe21708cb\",\"toolName\":\"chat\",\"args\":\"[SystemMessage { text = \\\"You are an expert city travel guide. When asked about a city, you MUST:\\n1. First find the top attractions using the findAttractions tool\\n2. Then search for restaurants matching the user's cuisine preference using searchRestaurants\\n3. Finally get transport information using getTransportInfo\\nCombine all results into a well-organized city guide with sections for\\nAttractions, Restaurants, and Getting Around.\\nKeep it concise but informative.\\n\\\" }, UserMessage { name = null, contents = [TextContent { text = \\\"Create a city guide for Paris.\\nCuisine preference: french.\\nTrip duration: 3 days.\\n\\\" }], attributes = {} }]\"}"
+- date: 2026-05-07T08:14:47.893346378Z
+  eventType: ExecutionStarted
+  metadata:
+    name: dapr.langchain4j.CityGuide.workflow
+    orchestration_instance_id: cd6df128-4b59-4e6f-994e-81d71560d936
+    orchestration_span_id: 1301d470e35a188a
+    parent_trace_context_trace_parent: 00-53d49e649fef905eb5de9a4c302eaa9a-91db8e8e4e267807-01
+

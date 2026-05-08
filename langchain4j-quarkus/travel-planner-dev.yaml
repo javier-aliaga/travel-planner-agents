@@ -1,0 +1,7 @@
+version: 1
+common:
+  appLogDestination: console
+apps:
+  - appID: langchain4j-agent
+    appDirPath: ./
+    command: ["mvn", "quarkus:dev", "-Ddebug=false"]
