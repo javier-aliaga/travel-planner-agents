@@ -49,6 +49,10 @@ build-sdk:
 	cd ../../salaboy-java-sdk/quarkus && \
 		mvn install -Dspotbugs.skip=true -DskipTests -q
 
+## Flush Redis (clear all workflow state)
+redis-flush:
+	docker exec dapr_redis redis-cli FLUSHDB
+
 ## Clean
 clean:
 	mvn clean -q

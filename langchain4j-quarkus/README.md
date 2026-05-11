@@ -85,7 +85,7 @@ Workflows will be visible in the Diagrid Dashboard.
 | `make test-guide` | CityGuide | Standalone (3 tools) | COMPLETED |
 | `make test-trip` | TripPrep | @SequenceAgent (2 standalone agents) | COMPLETED |
 | `make test-research` | QuickResearch | @ParallelAgent (2 standalone agents) | COMPLETED |
-| `make test-travel` | TravelPlanner | @SequenceAgent + nested @ParallelAgent | Known issue: nested composite input mismatch |
+| `make test-travel` | TravelPlanner | @SequenceAgent + nested @ParallelAgent | Unstable: nested composites may hang due to thread pool timing |
 
 ### Calling the travel endpoint
 
