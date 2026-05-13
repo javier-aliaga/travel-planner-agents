@@ -47,11 +47,18 @@
             <version>${dapr-quarkus-agentic.version}</version>
         </dependency>
 
-        <!-- LLM provider (swap to quarkus-langchain4j-openai if using OpenAI) -->
+        <!-- LLM provider: Ollama (direct) -->
         <dependency>
             <groupId>io.quarkiverse.langchain4j</groupId>
             <artifactId>quarkus-langchain4j-ollama</artifactId>
             <version>${quarkus-langchain4j.version}</version>
+        </dependency>
+
+        <!-- LLM provider: Dapr Conversation API (provider-agnostic) -->
+        <dependency>
+            <groupId>io.dapr.quarkus</groupId>
+            <artifactId>quarkus-langchain4j-dapr</artifactId>
+            <version>${dapr-quarkus-agentic.version}</version>
         </dependency>
 
         <!-- REST endpoint -->

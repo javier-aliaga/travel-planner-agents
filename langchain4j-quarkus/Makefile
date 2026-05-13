@@ -20,7 +20,7 @@ dapr:
 		--dapr-grpc-port $(DAPR_GRPC) \
 		--dapr-http-port $(DAPR_HTTP) \
 		--resources-path ./components \
-		--log-level info
+		--log-level debug
 
 ## Start Quarkus app (run in a separate terminal)
 app:

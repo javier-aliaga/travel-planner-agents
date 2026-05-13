@@ -108,12 +108,59 @@ Parameters (all optional, have defaults):
 | `nights` | 5 | Number of nights |
 | `interests` | history, food, culture | Comma-separated interests |
 
-## Using OpenAI instead of Ollama
+## LLM Provider Configuration
 
-In `pom.xml`, swap the dependency:
+This project supports two LLM provider modes:
+
+### Option A: Ollama (direct, default)
+
+Calls Ollama directly from the app. No Dapr sidecar needed for LLM calls.
+
+```properties
+quarkus.langchain4j.chat-model.provider=ollama
+quarkus.langchain4j.ollama.chat-model.model-id=llama3.1:8b
+quarkus.langchain4j.ollama.timeout=120s
+```
+
+### Option B: Dapr Conversation API (provider-agnostic)
+
+Routes LLM calls through the Dapr Conversation building block. Swap LLM providers
+(OpenAI, Anthropic, Ollama, etc.) by changing the Dapr component config — no Java
+code changes needed.
+
+```properties
+quarkus.langchain4j.chat-model.provider=dapr-conversation
+quarkus.langchain4j.dapr.component-name=llm
+quarkus.langchain4j.dapr.temperature=0.7
+```
+
+Then define a Dapr conversation component in `components/conversation.yaml`:
+
+```yaml
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: llm
+spec:
+  type: conversation.openai
+  version: v1
+  metadata:
+  - name: endpoint
+    value: "http://localhost:11434/v1"   # Ollama's OpenAI-compatible endpoint
+  - name: model
+    value: "llama3.1:8b"
+  - name: key
+    value: "ollama"                      # Required but ignored by Ollama
+```
+
+To use a real OpenAI endpoint, change `endpoint` to `https://api.openai.com/v1`
+and `key` to your API key. To use Anthropic, change `type` to `conversation.anthropic`.
+
+### Option C: OpenAI (direct)
+
+In `pom.xml`, replace `quarkus-langchain4j-ollama` with:
 
 ```xml
-<!-- Replace quarkus-langchain4j-ollama with: -->
 <dependency>
     <groupId>io.quarkiverse.langchain4j</groupId>
     <artifactId>quarkus-langchain4j-openai</artifactId>
@@ -121,9 +168,8 @@ In `pom.xml`, swap the dependency:
 </dependency>
 ```
 
-In `application.properties`, replace the Ollama config with:
-
 ```properties
+quarkus.langchain4j.chat-model.provider=openai
 quarkus.langchain4j.openai.api-key=${OPENAI_API_KEY}
 quarkus.langchain4j.openai.chat-model.model-name=gpt-4o-mini
 ```
