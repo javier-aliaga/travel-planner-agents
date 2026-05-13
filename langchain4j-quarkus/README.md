@@ -30,6 +30,8 @@ TravelPlanner (@SequenceAgent)
 | ItineraryFormatter | `@Agent` | none | Combines results into a formatted itinerary |
 | TripPrep | `@SequenceAgent` | — | Weather → CityGuide in sequence |
 | QuickResearch | `@ParallelAgent` | — | Weather + CityGuide in parallel |
+| ItineraryRefiner | `@LoopAgent` | — | Weather + CityGuide looped twice |
+| TravelRouter | `@ConditionalAgent` | — | Routes by trip duration (weather vs full guide) |
 | TravelResearch | `@ParallelAgent` | — | Flight + hotel + activity search concurrently |
 | TravelPlanner | `@SequenceAgent` | — | Orchestrates research then formatting |
 
@@ -81,11 +83,14 @@ Workflows will be visible in the Diagrid Dashboard.
 
 | Endpoint | Agent | Type | Status |
 |----------|-------|------|--------|
-| `make test-weather` | WeatherAssistant | Standalone (1 tool) | COMPLETED |
-| `make test-guide` | CityGuide | Standalone (3 tools) | COMPLETED |
-| `make test-trip` | TripPrep | @SequenceAgent (2 standalone agents) | COMPLETED |
-| `make test-research` | QuickResearch | @ParallelAgent (2 standalone agents) | COMPLETED |
-| `make test-travel` | TravelPlanner | @SequenceAgent + nested @ParallelAgent | Unstable: nested composites may hang due to thread pool timing |
+| `make test-weather` | WeatherAssistant | @Agent (1 tool) | Stable |
+| `make test-guide` | CityGuide | @Agent (3 tools) | Stable |
+| `make test-trip` | TripPrep | @SequenceAgent | Stable |
+| `make test-research` | QuickResearch | @ParallelAgent | Stable |
+| `make test-refine` | ItineraryRefiner | @LoopAgent (2 iterations) | Stable |
+| `make test-route-quick` | TravelRouter | @ConditionalAgent (days<=1 → weather only) | Stable |
+| `make test-route-long` | TravelRouter | @ConditionalAgent (days>1 → weather + guide) | Stable |
+| `make test-travel` | TravelPlanner | @SequenceAgent + nested @ParallelAgent | Unstable (model-dependent) |
 
 ### Calling the travel endpoint
 
@@ -153,6 +158,8 @@ src/main/java/io/dapr/examples/travel/
 ├── orchestration/
 │   ├── TripPrep.java                @SequenceAgent (weather → guide)
 │   ├── QuickResearch.java           @ParallelAgent (weather + guide)
+│   ├── ItineraryRefiner.java        @LoopAgent (weather + guide x2)
+│   ├── TravelRouter.java            @ConditionalAgent (by trip duration)
 │   ├── TravelPlanner.java           @SequenceAgent (top-level)
 │   ├── TravelResearch.java          @ParallelAgent (research phase)
 │   └── TravelResearchResult.java    Result record
