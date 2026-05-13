@@ -12,7 +12,7 @@ import io.dapr.examples.travel.agents.WeatherAssistant;
 public interface ItineraryRefiner {
 
     @LoopAgent(name = "itinerary-refiner",
-            outputKey = "refined-itinerary",
+            outputKey = "guide",
             maxIterations = 2,
             subAgents = {WeatherAssistant.class, CityGuide.class})
     String refine(@V("city") String city,
