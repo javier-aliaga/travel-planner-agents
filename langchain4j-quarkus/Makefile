@@ -41,6 +41,15 @@ test-research:
 test-trip:
 	curl -s "http://localhost:8080/trip?city=Paris&cuisine=french&days=3"
 
+test-route-quick:
+	curl -s "http://localhost:8080/route?city=Paris&days=1"
+
+test-route-long:
+	curl -s "http://localhost:8080/route?city=Paris&cuisine=french&days=3"
+
+test-refine:
+	curl -s "http://localhost:8080/refine?city=Paris&cuisine=french&days=3"
+
 test-travel:
 	curl -s "http://localhost:8080/travel/plan?origin=NYC&destination=Paris&date=2025-07-01&nights=5&interests=history,food"
 
