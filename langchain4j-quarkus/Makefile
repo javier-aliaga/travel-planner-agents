@@ -53,6 +53,22 @@ test-refine:
 test-travel:
 	curl -s "http://localhost:8080/travel/plan?origin=NYC&destination=Paris&date=2025-07-01&nights=5&interests=history,food"
 
+## Crash recovery test — triggers a slow agent (30s tool), kill the app mid-execution, restart to see recovery
+## Step 1: make test-crash        (starts the slow agent)
+## Step 2: make kill-app           (kill while "sleeping 30s" appears in logs)
+## Step 3: make app                (restart — watch for "Recovery timeout" and "Recovery complete")
+test-crash:
+	curl -s "http://localhost:8080/crash-test?country=France"
+
+kill-app:
+	@PID=$$(lsof -ti :8080); \
+	if [ -n "$$PID" ]; then \
+		kill -9 $$PID; \
+		echo "Killed process $$PID (port 8080)"; \
+	else \
+		echo "No process found on port 8080"; \
+	fi
+
 ## Build the quarkus extension (run from SDK repo first)
 build-sdk:
 	cd ../../salaboy-java-sdk/quarkus && \

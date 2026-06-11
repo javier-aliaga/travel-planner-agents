@@ -5,7 +5,8 @@ Multi-agent travel planner that demonstrates orchestration patterns using
 and [Dapr Workflows](https://docs.dapr.io/developing-applications/building-blocks/workflow/).
 
 Every LLM call and tool call is a **durable Dapr Workflow activity** — if the
-process crashes mid-execution, the workflow resumes from the last successful step.
+process crashes mid-execution, completed agents are skipped on restart and the
+in-progress agent is automatically re-run from its original prompt and tools.
 
 ## Architecture
 
@@ -28,6 +29,7 @@ TravelPlanner (@SequenceAgent)
 | HotelFinder | `@Agent` | HotelTools | Searches and recommends hotels |
 | ActivityPlanner | `@Agent` | ActivityTools | Plans activities based on interests |
 | ItineraryFormatter | `@Agent` | none | Combines results into a formatted itinerary |
+| TravelAdvisor | `@Agent` | SlowApiTools | Travel advisories via a slow (30s) tool — used for the crash recovery demo |
 | TripPrep | `@SequenceAgent` | — | Weather → CityGuide in sequence |
 | QuickResearch | `@ParallelAgent` | — | Weather + CityGuide in parallel |
 | ItineraryRefiner | `@LoopAgent` | — | Weather + CityGuide looped twice |
@@ -42,6 +44,8 @@ All tools return mock data and can be swapped for real API integrations:
 - **FlightTools** — `searchFlights(origin, destination, date)`
 - **HotelTools** — `searchHotels(city, checkIn, nights)`
 - **ActivityTools** — `searchActivities(city, interests)`
+- **SlowApiTools** — `fetchTravelAdvisory(country)` sleeps 30s so you can kill the
+  process mid-call and watch crash recovery
 
 ## Prerequisites
 
@@ -51,8 +55,9 @@ All tools return mock data and can be swapped for real API integrations:
 - [Ollama](https://ollama.ai/) running locally (or swap to OpenAI)
 
 ```bash
-# Pull a model for Ollama
-ollama pull llama3.2
+# Pull a model for Ollama — use llama3.1:8b or larger.
+# Smaller models (e.g. llama3.2 3B) often malform tool call arguments.
+ollama pull llama3.1:8b
 ```
 
 ## Running
@@ -90,7 +95,8 @@ Workflows will be visible in the Diagrid Dashboard.
 | `make test-refine` | ItineraryRefiner | @LoopAgent (2 iterations) | Stable |
 | `make test-route-quick` | TravelRouter | @ConditionalAgent (days<=1 → weather only) | Stable |
 | `make test-route-long` | TravelRouter | @ConditionalAgent (days>1 → weather + guide) | Stable |
-| `make test-travel` | TravelPlanner | @SequenceAgent + nested @ParallelAgent | Unstable (model-dependent) |
+| `make test-travel` | TravelPlanner | @SequenceAgent + nested @ParallelAgent | Re-test pending (nested-composite fixes landed in the extension; quality still model-dependent) |
+| `make test-crash` | TravelAdvisor | @Agent + slow tool (crash recovery demo) | Stable |
 
 ### Calling the travel endpoint
 
@@ -112,21 +118,11 @@ Parameters (all optional, have defaults):
 
 This project supports two LLM provider modes:
 
-### Option A: Ollama (direct, default)
-
-Calls Ollama directly from the app. No Dapr sidecar needed for LLM calls.
-
-```properties
-quarkus.langchain4j.chat-model.provider=ollama
-quarkus.langchain4j.ollama.chat-model.model-id=llama3.1:8b
-quarkus.langchain4j.ollama.timeout=120s
-```
-
-### Option B: Dapr Conversation API (provider-agnostic)
+### Option A: Dapr Conversation API (provider-agnostic, default)
 
 Routes LLM calls through the Dapr Conversation building block. Swap LLM providers
 (OpenAI, Anthropic, Ollama, etc.) by changing the Dapr component config — no Java
-code changes needed.
+code changes needed. This is the active default in `application.properties`.
 
 ```properties
 quarkus.langchain4j.chat-model.provider=dapr-conversation
@@ -156,6 +152,16 @@ spec:
 To use a real OpenAI endpoint, change `endpoint` to `https://api.openai.com/v1`
 and `key` to your API key. To use Anthropic, change `type` to `conversation.anthropic`.
 
+### Option B: Ollama (direct)
+
+Calls Ollama directly from the app. No Dapr sidecar needed for LLM calls.
+
+```properties
+quarkus.langchain4j.chat-model.provider=ollama
+quarkus.langchain4j.ollama.chat-model.model-id=llama3.1:8b
+quarkus.langchain4j.ollama.timeout=120s
+```
+
 ### Option C: OpenAI (direct)
 
 In `pom.xml`, replace `quarkus-langchain4j-ollama` with:
@@ -173,6 +179,28 @@ quarkus.langchain4j.chat-model.provider=openai
 quarkus.langchain4j.openai.api-key=${OPENAI_API_KEY}
 quarkus.langchain4j.openai.chat-model.model-name=gpt-4o-mini
 ```
+
+## Crash Recovery Demo
+
+`TravelAdvisor` calls `SlowApiTools.fetchTravelAdvisory()`, which sleeps for 30
+seconds — long enough to kill the process mid-call:
+
+```bash
+# Terminal 1: trigger the slow agent
+make test-crash          # GET /crash-test?country=France
+
+# Terminal 2: while the tool is sleeping, kill the app
+make kill-app
+
+# Restart the app — the workflow resumes automatically
+make app
+```
+
+On restart, Dapr replays the workflow: completed agents return cached results,
+and the in-progress agent (TravelAdvisor) is re-run from scratch — its original
+prompt and tools are re-executed by the extension's `RecoveryAgentActivity`.
+Recovery is **agent-level**: LLM/tool calls inside the recovered agent run again;
+completed agents are not re-run.
 
 ## Testing
 
@@ -193,13 +221,17 @@ src/main/java/io/dapr/examples/travel/
 ├── CityGuideResource.java           GET /guide
 ├── TripPrepResource.java            GET /trip
 ├── QuickResearchResource.java       GET /research
+├── ItineraryRefinerResource.java    GET /refine
+├── TravelRouterResource.java        GET /route
 ├── TravelResource.java              GET /travel/plan
+├── CrashRecoveryResource.java       GET /crash-test
 ├── agents/
 │   ├── WeatherAssistant.java        @Agent + WeatherTools
 │   ├── CityGuide.java               @Agent + CityGuideTools
 │   ├── FlightFinder.java            @Agent + FlightTools
 │   ├── HotelFinder.java             @Agent + HotelTools
 │   ├── ActivityPlanner.java         @Agent + ActivityTools
+│   ├── TravelAdvisor.java           @Agent + SlowApiTools (crash demo)
 │   └── ItineraryFormatter.java      @Agent (LLM-only, no tools)
 ├── orchestration/
 │   ├── TripPrep.java                @SequenceAgent (weather → guide)
@@ -214,7 +246,8 @@ src/main/java/io/dapr/examples/travel/
     ├── CityGuideTools.java          Mock city guide APIs (3 tools)
     ├── FlightTools.java             Mock flight search
     ├── HotelTools.java              Mock hotel search
-    └── ActivityTools.java           Mock activity search
+    ├── ActivityTools.java           Mock activity search
+    └── SlowApiTools.java            30s-slow advisory API (crash demo)
 ```
 
 ## How it works
@@ -228,8 +261,9 @@ src/main/java/io/dapr/examples/travel/
 4. Step 2: `ItineraryFormatter` receives the combined results and produces the final itinerary
 5. The response is returned to the caller
 
-All tool calls are recorded in the Dapr Workflow history. If the process crashes,
-the workflow resumes from the last completed activity.
+All LLM and tool calls are recorded in the Dapr Workflow history. If the process
+crashes, completed agents are skipped on replay and the in-progress agent is
+re-run from scratch (agent-level recovery — see the Crash Recovery Demo above).
 
 ## Agent Registry
 
@@ -237,6 +271,14 @@ Agents are automatically registered in the Dapr state store at startup using the
 `dapr-agents` registry protocol. This makes them discoverable by other agents
 (Python dapr-agents, other Java services) and visible in Diagrid Catalyst.
 
+Configured in `application.properties`:
+
+```properties
+dapr.agents.statestore=agent-registry
+dapr.agents.team=travel-planner
+dapr.appid=langchain4j-agent
+```
+
 Registry keys:
-- Per-agent: `agents:{team}:{agent-name}`
-- Team index: `agents:{team}:_index`
+- Per-agent: `agents:travel-planner:{agent-name}`
+- Team index: `agents:travel-planner:_index`
