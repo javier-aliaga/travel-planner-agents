@@ -95,7 +95,7 @@ Workflows will be visible in the Diagrid Dashboard.
 | `make test-refine` | ItineraryRefiner | @LoopAgent (2 iterations) | Stable |
 | `make test-route-quick` | TravelRouter | @ConditionalAgent (days<=1 → weather only) | Stable |
 | `make test-route-long` | TravelRouter | @ConditionalAgent (days>1 → weather + guide) | Stable |
-| `make test-travel` | TravelPlanner | @SequenceAgent + nested @ParallelAgent | Re-test pending (nested-composite fixes landed in the extension; quality still model-dependent) |
+| `make test-travel` | TravelPlanner | @SequenceAgent + nested @ParallelAgent | Stable (verified with gpt-4o-mini; quality is model-dependent) |
 | `make test-crash` | TravelAdvisor | @Agent + slow tool (crash recovery demo) | Stable |
 
 ### Calling the travel endpoint
@@ -130,7 +130,10 @@ quarkus.langchain4j.dapr.component-name=llm
 quarkus.langchain4j.dapr.temperature=0.7
 ```
 
-Then define a Dapr conversation component in `components/conversation.yaml`:
+Then define a Dapr conversation component in `components/conversation.yaml`. The
+committed default targets OpenAI `gpt-4o-mini`, with the API key resolved from the
+`OPENAI_API_KEY` environment variable via a local env secret store
+(`components/secretstore-env.yaml`) — so no secret is ever stored in the file:
 
 ```yaml
 apiVersion: dapr.io/v1alpha1
@@ -141,16 +144,21 @@ spec:
   type: conversation.openai
   version: v1
   metadata:
-  - name: endpoint
-    value: "http://localhost:11434/v1"   # Ollama's OpenAI-compatible endpoint
   - name: model
-    value: "llama3.1:8b"
+    value: "gpt-4o-mini"
   - name: key
-    value: "ollama"                      # Required but ignored by Ollama
+    secretKeyRef:
+      name: OPENAI_API_KEY
+      key: OPENAI_API_KEY
+auth:
+  secretStore: envvar-secrets
 ```
 
-To use a real OpenAI endpoint, change `endpoint` to `https://api.openai.com/v1`
-and `key` to your API key. To use Anthropic, change `type` to `conversation.anthropic`.
+Export `OPENAI_API_KEY` in the shell that starts the Dapr sidecar (`make dapr`) —
+`daprd` reads its environment at launch. To target Ollama instead, add
+`- name: endpoint` with `value: "http://localhost:11434/v1"`, set `model` to
+`llama3.1:8b`, and replace the `key` block with `value: "ollama"`. To use
+Anthropic, change `type` to `conversation.anthropic`.
 
 ### Option B: Ollama (direct)
 
