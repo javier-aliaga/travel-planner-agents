@@ -6,9 +6,11 @@ spec:
   type: conversation.openai
   version: v1
   metadata:
-  - name: endpoint
-    value: "http://localhost:11434/v1"
   - name: model
-    value: "llama3.1:8b"
+    value: "gpt-4o-mini"
   - name: key
-    value: "ollama"
+    secretKeyRef:
+      name: OPENAI_API_KEY
+      key: OPENAI_API_KEY
+auth:
+  secretStore: envvar-secrets
